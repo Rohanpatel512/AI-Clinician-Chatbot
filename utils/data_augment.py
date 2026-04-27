@@ -29,7 +29,7 @@ def _preprocess(dataset_df, symptom_description_df, symptom_precaution_df, sympt
     )
     disease_set = set(dataset_df['Disease'])
     dataset = remove_missing(dataset_df, disease_set)
-    symptom_precaution_df = remove_missing_precaution(symptom_precaution_df)
+    symptom_precaution_df = apply_precaution_mapping(symptom_precaution_df)
 
     return dataset, symptom_description_df, symptom_precaution_df, symptom_severity_df, disease_set
 
