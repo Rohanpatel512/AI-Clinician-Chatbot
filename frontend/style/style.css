@@ -1,0 +1,130 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: white;
+}
+
+.header {
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    line-height: 2;
+    font-family: 'Inter', 'Source Sans 3', system-ui, -apple-system, sans-serif
+}
+
+.header p {
+    color: gray;
+}
+
+.chat-container {
+    width: 50%;
+    height: 40%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    padding: 16px;
+    gap: 12px;
+}
+
+.messages-container {
+    width: 100%;
+    height: 35%;
+    /*border: 0.01px solid gray;*/
+    box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.19);
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 0;
+    position: relative;
+}
+
+.chat-messages {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    overflow-y: auto;
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.message-row {
+    display: flex;
+    width: 100%;
+}
+
+.message-row.bot {
+    justify-content: flex-start;
+}
+
+.message-row.user {
+    justify-content: flex-end;
+}
+
+.message-bubble {
+    max-width: 75%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    line-height: 1.5;
+    font-family: 'Inter', 'Source Sans 3', system-ui, -apple-system, sans-serif;
+    word-break: break-word;
+}
+
+.message-row.bot .message-bubble {
+    background-color: #e2e8f0;
+    color: #0f172a;
+    border-bottom-left-radius: 6px;
+}
+
+.message-row.user .message-bubble {
+    background-color: #0e78c9;
+    color: #ffffff;
+    border-bottom-right-radius: 6px;
+}
+
+#messages {
+    width: 95%;
+    height: 50%;
+    margin: 10px auto;
+    border-radius: 10px;
+    border: none;
+    resize: none;
+}
+
+#messages:focus {
+    outline: none;
+}
+
+#send-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 32px;
+    width: 40px;
+    height: 30px;
+    border-radius: 50px;
+    border: none;
+    background-color: #0e78c9;
+}
+
+#send-btn i {
+    color: white;
+}
+
+#send-btn:hover {
+    cursor: pointer;
+}

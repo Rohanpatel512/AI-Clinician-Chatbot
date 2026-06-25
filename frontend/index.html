@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="./style/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <title>Clincian Assistant</title>
+    </head>
+    <body>
+
+        <div class="header">
+            <h1><span id='greeting'></span></h1>
+            <p id="description">Your AI assistant for clincial questions and medical information.</p>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-messages"></div>
+            <div class="messages-container">
+                <textarea id="messages" placeholder="Ask a clinical question, e.g, What are the symptoms of diabetes?"></textarea>
+                <button type="submit" id="send-btn">
+                    <i class="fa fa-paper-plane-o"></i>
+                </button>
+            </div>
+        </div>
+
+        <script src="./js/script.js"></script>
+    </body>
+</html>
