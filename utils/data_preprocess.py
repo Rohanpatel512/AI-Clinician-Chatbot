@@ -1,3 +1,5 @@
+# %% [code]
+# %% [code]
 # Imports 
 import pandas as pd 
 import numpy as np 
@@ -101,7 +103,7 @@ def apply_precaution_mapping(symptom_precaution_df):
     """
     
     # Open up the mapping JSON file 
-    with open('../data/mappings/precaution_mapping.json', 'r') as file:
+    with open('/kaggle/input/datasets/rpatel29/precaution-mapping/precaution_mapping.json', 'r') as file:
         precaution_map = json.load(file)
 
     precaution_cols = symptom_precaution_df.columns[1:]

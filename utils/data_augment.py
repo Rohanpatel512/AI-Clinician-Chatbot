@@ -1,3 +1,8 @@
+# %% [code]
+# %% [code]
+# %% [code]
+import sys
+sys.path.insert(0, "/kaggle/usr/lib/notebooks/rpatel29")
 import pandas as pd 
 import numpy as np 
 import json 
@@ -6,16 +11,16 @@ from pathlib import Path
 from data_preprocess import * 
 import random 
 
-BASE_DIR = Path(__file__).resolve().parent
-REPO_ROOT = BASE_DIR.parent
+#BASE_DIR = Path(__file__).resolve().parent
+#REPO_ROOT = BASE_DIR.parent
 
 def _load_data():
     """Load the raw symptom CSV files used for augmentation."""
-
-    dataset_df = pd.read_csv(REPO_ROOT / 'data' / 'symptom_data' / 'dataset.csv')
-    symptom_description_df = pd.read_csv(REPO_ROOT / 'data' / 'symptom_data' / 'symptom_Description.csv')
-    symptom_precaution_df = pd.read_csv(REPO_ROOT / 'data' / 'symptom_data' / 'symptom_precaution.csv')  
-    symptom_severity_df = pd.read_csv(REPO_ROOT / 'data' / 'symptom_data' / 'Symptom-severity.csv')
+    
+    dataset_df = pd.read_csv('/kaggle/input/datasets/rpatel29/symptom-data/symptom_data/dataset.csv')
+    symptom_description_df = pd.read_csv('/kaggle/input/datasets/rpatel29/symptom-data/symptom_data/symptom_Description.csv')
+    symptom_precaution_df = pd.read_csv('/kaggle/input/datasets/rpatel29/symptom-data/symptom_data/symptom_precaution.csv')  
+    symptom_severity_df = pd.read_csv('/kaggle/input/datasets/rpatel29/symptom-data/symptom_data/Symptom-severity.csv')
 
     return dataset_df, symptom_description_df, symptom_precaution_df, symptom_severity_df 
 
@@ -39,7 +44,7 @@ def augment():
     disease_to_symptoms = defaultdict(set)
     augmented = deque()
 
-    symptom_dataset_path = REPO_ROOT / 'JSON_data' / 'symptom_dataset.json'
+    symptom_dataset_path = '/kaggle/input/datasets/rpatel29/symptom-dataset/symptom_dataset.json'
 
     with open(symptom_dataset_path, 'r') as file:
         symptom_dataset = json.load(file)
@@ -72,7 +77,7 @@ def augment():
     
     augmented = list(augmented)
 
-    with open(symptom_dataset_path, 'w') as file:
+    with open('/kaggle/working/symptom_dataset.json', 'w') as file:
         json.dump(symptom_dataset + augmented, file, indent=4)
         
 
@@ -96,7 +101,4 @@ def _generate_case(disease, symptoms, description_lookup, precaution_lookup, min
     }
 
     return data 
-
-
-
 
