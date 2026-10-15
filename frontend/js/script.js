@@ -1,5 +1,7 @@
 let conversation_history = []
 const chatMessages = document.querySelector('.chat-messages');
+const thinkingIndicator = document.querySelector('#thinking-indicator');
+const API_BASED_URL = window.APP_CONFIG?.API_BASED_URL ?? "";
 
 window.onload = () => {
     const greeting = document.getElementById('greeting');
@@ -13,7 +15,7 @@ window.onload = () => {
         greeting.textContent = typeGreet('Good evening');
     }
 
-    displayMessage('bot', 'Hello. I am your AI clinician assistant. How can I help you today?');
+    displayMessage('Assistant', 'Hello. I am your AI clinician assistant. How can I help you today?');
     setupChat();
 };
 
@@ -44,41 +46,36 @@ function setupChat() {
         }
     });
 
-    function sendMessage() {
+    async function sendMessage() {
         const text = messageInput.value.trim();
 
         if (!text) {
             return;
         }
 
-        appendMessage('user', text);
+        displayMessage('Patient', text);
         messageInput.value = '';
-        
-        /*
-        // TODO: Send user's message over to server 
-        fetch('/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                message: text,
-                history: conversation_history
-            })
-        })
-        
-        .then(response => response.json())
-        .then(data => {
-            // Temporary placeholder response until the API is connected.
-            window.setTimeout(() => {
-                appendMessage('bot', data['res']);
-            }, 500);
-        });
-        */
 
-        window.setTimeout(() => {
-            appendMessage('bot', 'Thank you for your message! You will get your response when model is ready!')
-        }, 3000)
+        // Toggle-on thinking mode
+        toggleThinking(true);
+
+        try {
+            const response = await fetch(`${API_BASED_URL}/chat/send_message`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({message: text, conversation_history: conversation_history}),
+            });
+
+            toggleThinking(false);
+            const data = await response.json()
+
+
+            appendMessage('Assistant', data['response'])
+        } catch(error) {
+            console.error('Error sending message:', error);
+        }
     }
 
     function appendMessage(sender, text) {
@@ -88,7 +85,7 @@ function setupChat() {
 
         messageRow.className = `message-row ${sender}`;
         messageBubble.className = 'message-bubble';
-        messageBubble.textContent = text;
+        type(text, messageBubble);
 
         messageRow.appendChild(messageBubble);
         chatMessages.appendChild(messageRow);
@@ -121,3 +118,35 @@ function displayMessage(sender, text) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
 }       
+
+function toggleThinking(isThinking) {
+
+    console.log("is thinking function on...");
+
+    if(isThinking) {
+        // Unhide thinking indicator
+        thinkingIndicator.classList.remove("hidden");
+    } else {
+        thinkingIndicator.classList.add("hidden");
+    }
+
+}
+
+function type(text, messageBubble) {
+
+    return new Promise((resolve) => {
+        messageBubble.textContent = "";
+        let index = 0;
+
+        const interval = setInterval(() => {
+            if (index < text.length) {
+                messageBubble.textContent += text[index];
+                index++;
+            } else {
+                clearInterval(interval);
+                resolve();
+            }
+        }, 50);
+    });
+
+}

@@ -28,7 +28,7 @@ if not pc.has_index(index_name):
 
 index = pc.Index(index_name)
 
-def _load_vector_db(chunks, batch_size=50):
+def _load_vector_db(chunks: list, batch_size=50) -> None:
     """
     Loads all chunks into vector database.
     Parameters:
@@ -46,7 +46,7 @@ def _load_vector_db(chunks, batch_size=50):
         )
 
 
-def search(user_query, k=10):
+def search(user_query: str, k=10) -> str:
     """
     Performs semantic search on users query and gets the
     top 10 best answers and selects one with the highest
@@ -57,7 +57,7 @@ def search(user_query, k=10):
       k (int) - Number of neighbors to "look at" when selecting best answer
     
     Returns:
-      answer - Best answer given users query.
+      answer (str) - Best answer given users query.
     """
     
     results = index.search(

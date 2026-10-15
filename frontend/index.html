@@ -8,22 +8,38 @@
         <title>Clincian Assistant</title>
     </head>
     <body>
+        <div class="app-shell">
+            <header class="header">
+                <div class="brand-pill">AI Clinician</div>
+                <h1><span id="greeting"></span></h1>
+                <p id="description">Your AI assistant for clinical questions and medical information.</p>
+            </header>
 
-        <div class="header">
-            <h1><span id='greeting'></span></h1>
-            <p id="description">Your AI assistant for clincial questions and medical information.</p>
+            <main class="chat-container" aria-label="Clinician assistant chat">
+                <div class="chat-messages" aria-live="polite"></div>
+                <div class="composer-wrapper">
+                    <div id="thinking-indicator" class="hidden">
+                        <div class="thinking-bubble">
+                            <span>Thinking</span>
+                            <div class="dots" aria-hidden="true">
+                                <span>.</span>
+                                <span>.</span>
+                                <span>.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="messages-container">
+                        <textarea id="messages" placeholder="Ask a clinical question, e.g. What are the symptoms of diabetes?"></textarea>
+                        <button type="submit" id="send-btn" aria-label="Send message">
+                            <i class="fa fa-paper-plane-o" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+            </main>
         </div>
 
-        <div class="chat-container">
-            <div class="chat-messages"></div>
-            <div class="messages-container">
-                <textarea id="messages" placeholder="Ask a clinical question, e.g, What are the symptoms of diabetes?"></textarea>
-                <button type="submit" id="send-btn">
-                    <i class="fa fa-paper-plane-o"></i>
-                </button>
-            </div>
-        </div>
-
+        <script src="./js/runtime-config.js"></script>
         <script src="./js/script.js"></script>
     </body>
 </html>
