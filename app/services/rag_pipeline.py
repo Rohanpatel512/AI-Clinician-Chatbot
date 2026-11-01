@@ -1,6 +1,7 @@
 # Imports 
 from rag.vector_store import search 
 from rag.augmentation import augment_prompt
+from app.core.schemas import QueryProcessor
 from fastapi import HTTPException
 import httpx 
 import os 
@@ -31,34 +32,51 @@ def contextualize_query(raw_query: str, conversation_history: list) -> str:
     # Formulate the prompt
     
     prompt = f"""
-    You rewrite patient messages into standard medical search queries in the same point of view as user using the recent conversation history.
+    You are a dual-purpose medical AI assistant. Your tasks are to rewrite a patient's message into a standalone search query AND classify their clinical urgency for safety routing.
 
-    Rules:
-     - Detect contextual follow-ups, not just pronouns. Messages like "What about at night?", "And for kids?",
-     or "Is that serious?" may depend on prior context.\n
-     - If the question is already standalone, do not rewrite it, keep it as it is.\n
-     - Use relevant conversation history references, including symptoms, conditions, medications,
-     treatments, and topics mentioned in prior answers.\n
-     - Preserve the patient's intent and distinguish follow-ups, added details, and new topics. Include only context relevant
-      to the current question.\n
-     - Never invent medical facts, assume a diagnosis, or treat assistant-mentioned possibilities as confirmed facts.\n
-     - If intended reference is genuinely unclear, do not guess; preserve the ambiguity so clarification can be 
-     requested.\n
-     - Do not answer the medical question. Return only the concise, standalone search query, with no explanation.\n\n
+    TASK 1: REWRITING RULES
+    - You rewrite patient messages into standard medical search queries in the same point of view as user using the recent conversation history.
+    - Detect contextual follow-ups, not just pronouns. Messages like "What about at night?", "And for kids?", or "Is that serious?" may depend on prior context.    
+    - If the question is already standalone, do not rewrite it, keep it as it is.
+    - Use relevant conversation history references, including symptoms, conditions, medications, treatments, and topics mentioned in prior answers.
+    - Preserve the patient's intent and distinguish follow-ups, added details, and new topics. Include only context relevant to the current question.
+    - Never invent medical facts, assume a diagnosis, or treat assistant-mentioned possibilities as confirmed facts.
+    - If intended reference is genuinely unclear, do not guess; preserve the ambiguity so clarification can be requested.
+    - Do not answer the medical question. Generate only the concise, standalone search query, with no explanation, inside the 'rewritten_query' field.
 
+    TASK 2: INTENT AND URGENCY CLASSIFICATION
+    - INTENT: Classify as ACTIVE_CONCERN if user describes active/recent symptoms happening to a person. Classify as GENERAL if it is general knowledge, definitions, facts, or hypothetical scenarios with no active patient. 
+    - URGENCY: Classify as CRITICAL for life-threatening emergencies. Classify as ACUTE if they need prompt assessment within hours but are stable. Classify as SUBACUTE for mild/chronic symptoms managed with routine care. Use NONE if intent is GENERAL.
+
+    Provide maximum objective focus on 'Latest Patient Message' to catch sudden clinical escalations.
+    """
+
+    content = f"""
     Conversation History:\n
     {chat_history}
 
     Latest Patient Message:\n
     {raw_query}
     """
+
     try:
-        response = client.chat.completions.create(
+        response = client.beta.chat.completions.parse(
             model = "gpt-4o-mini",
             messages=[
-                {"role": "user", "content": prompt}
-            ] 
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": content}
+            ],
+            response_format=QueryProcessor,
+            temperature=0.0
         )
+
+        result = response.choices[0].message
+
+        if result.refusal:
+            raise ValueError(f"Model refused: {result.refusal}")
+        if result.parsed is None:
+            raise ValueError("Model return no parsed output.")
+
     except openai.APIConnectionError as e:
         print("Connection failed:", repr(e.__cause__))
         print("Underlying cause:")
@@ -68,7 +86,8 @@ def contextualize_query(raw_query: str, conversation_history: list) -> str:
         print("API status:", e.status_code)
         print("API error:", e.message)
 
-    return response.choices[0].message.content.strip()
+
+    return result.parsed
 
 
 def create_chat_history(conversation_history: list) -> str:
@@ -106,8 +125,7 @@ async def rag_pipeline(user_query: str, rag_user_query: str, urgency: str, conve
     """
 
     # Retrieve the closest response to users query 
-    #retrieved_chunk = search(rag_user_query)
-    retrieved_chunk = ""
+    retrieved_chunk = search(rag_user_query)
     
     # Generate prompt to pass into LLM 
     prompt = augment_prompt(conversation_history, retrieved_chunk, user_query, urgency, first_turn)

@@ -23,7 +23,7 @@ image = (
     gpu="T4",
     image=image,
     max_containers=1,
-    scaledown_window=60,
+    scaledown_window=180,
     secrets=[modal.Secret.from_name("hugging_face")]
 )
 class ModalPipeline:
@@ -114,7 +114,7 @@ class ModalPipeline:
                 do_sample=False,
                 eos_token_id=self.tokenizer.eos_token_id,
                 pad_token_id=self.tokenizer.pad_token_id,
-                num_beams=1,
+                num_beams=4,
                 repetition_penalty=1.3,
                 no_repeat_ngram_size=3
             )

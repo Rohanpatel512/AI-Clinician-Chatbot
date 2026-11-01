@@ -12,6 +12,11 @@ MODEL_FILE_NAME = os.getenv("MODEL_FILE_NAME")
 HF_MODEL_TOKEN = os.getenv("HF_MODEL_TOKEN")
 MODAL_API_URL = os.getenv("MODAL_API_URL")
 
+REWRITER_REPO_ID = os.getenv("REWRITER_REPO_ID")
+REWRITER_FILE_NAME = os.getenv("REWRITER_FILE_NAME")
+
+OPEN_AI_KEY = os.getenv("OPEN_AI_KEY")
+
 CORS_ORIGINS = [
     origin.strip()
     for origin in os.getenv(

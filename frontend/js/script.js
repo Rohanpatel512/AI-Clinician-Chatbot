@@ -2,6 +2,8 @@ let conversation_history = []
 const chatMessages = document.querySelector('.chat-messages');
 const thinkingIndicator = document.querySelector('#thinking-indicator');
 const API_BASED_URL = window.APP_CONFIG?.API_BASED_URL ?? "";
+let messages = 0
+let firstTurn = false;
 
 window.onload = () => {
     const greeting = document.getElementById('greeting');
@@ -15,7 +17,6 @@ window.onload = () => {
         greeting.textContent = typeGreet('Good evening');
     }
 
-    displayMessage('Assistant', 'Hello. I am your AI clinician assistant. How can I help you today?');
     setupChat();
 };
 
@@ -56,6 +57,14 @@ function setupChat() {
         displayMessage('Patient', text);
         messageInput.value = '';
 
+        messages += 1
+
+        if(messages == 1){
+            firstTurn = true;
+        } else {
+            firstTurn = false;
+        }
+
         // Toggle-on thinking mode
         toggleThinking(true);
 
@@ -65,13 +74,13 @@ function setupChat() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({message: text, conversation_history: conversation_history}),
+                body: JSON.stringify({message: text, conversation_history: conversation_history, first_turn: firstTurn}),
             });
 
             toggleThinking(false);
             const data = await response.json()
 
-
+            addToHistory('Patient', text)
             appendMessage('Assistant', data['response'])
         } catch(error) {
             console.error('Error sending message:', error);
@@ -96,11 +105,13 @@ function setupChat() {
 }
 
 function addToHistory(sender, text) {
+    console.log("Adding to history...");
     conversation_history.push({role: sender, content: text});
     var length = conversation_history.length;
     if (length == 7) {
         conversation_history = conversation_history.slice(length - 3, length);
-    }
+    } 
+
     console.log(conversation_history)
     return conversation_history
 }
